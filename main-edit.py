@@ -25,18 +25,22 @@ cap = cv2.VideoCapture(0)
 noseCascade = cv2.CascadeClassifier('haarcascade_mcs_nose.xml')
 
 nose = np.empty(shape=(75,90,3))
-temp_roi = [[0,0,0], [0,0,0], [0,0,0]]
 
 # Temp detection
-while nose.all() != 0:
+while True:
     ret, temp_frame = cap.read()
     temp_frame = rescale_frame(temp_frame, percent=rescale_percent)
     
     # Detect ROI
+    global temp_roi
     temp_frame = cv2.cvtColor(temp_frame, cv2.COLOR_BGR2GRAY)
-    nose = noseCascade.detectMultiScale(temp_frame, scaleFactor=5, minNeighbors=1)
-    for (x, y, w, h) in nose:
-        temp_roi = temp_frame[y:y+h, x:x+w]
+    if temp_roi.all() != 0:
+        nose = noseCascade.detectMultiScale(temp_frame, scaleFactor=5, minNeighbors=1)
+        for (x, y, w, h) in nose:
+            temp_roi = temp_frame[y:y+h, x:x+w]
+        cv2.imshow('temp', temp_frame)
+    else:
+        break
 
 # make prev_image before processed to detect
 #ret, frame1 = cap.read()
