@@ -24,13 +24,27 @@ cap = cv2.VideoCapture(0)
 #fullbodyCascade = cv2.CascadeClassifier('/home/muhardianab/opencv/data/haarcascades/haarcascade_fullbody.xml')
 noseCascade = cv2.CascadeClassifier('haarcascade_mcs_nose.xml')
 
+nose = np.empty(shape=(75,90,3))
+temp_roi = [[0,0,0], [0,0,0], [0,0,0]]
+
+# Temp detection
+while nose.all() != 0:
+    ret, temp_frame = cap.read()
+    temp_frame = rescale_frame(temp_frame, percent=rescale_percent)
+    
+    # Detect ROI
+    temp_frame = cv2.cvtColor(temp_frame, cv2.COLOR_BGR2GRAY)
+    nose = noseCascade.detectMultiScale(temp_frame, scaleFactor=5, minNeighbors=1)
+    for (x, y, w, h) in nose:
+        temp_roi = temp_frame[y:y+h, x:x+w]
+
 # make prev_image before processed to detect
 #ret, frame1 = cap.read()
 #frame1 = rescale_frame(frame1, percent=rescale_percent)
 #prev_image = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
-frame1 = np.loadtxt("test1.txt", delimiter=',')
-prev_image = frame1
-hsv = np.zeros_like(frame1)
+#frame1 = np.loadtxt("kosong.txt", delimiter=',')
+
+hsv = np.zeros_like(temp_roi)       #prev_image = temp_roi
 hsv[..., 1] = 255
 
 while(True):
@@ -55,19 +69,9 @@ while(True):
         img_item = "image.png"
         cv2.imwrite(img_item, roi_gray)
         np.savetxt("test1.txt", roi_gray)
-        
-        # im=ImageGrab.grab(bbox=nose.any()) # X1,Y1,X2,Y2
-        # print(im)
-        # np.savetxt("test1.txt", im)
-        # im=im.convert('RGB')
-        # print(im)
-        # np.savetxt("test2.txt", im)
-        # im = np.array(im)
-        # print(im)
-        # np.savetxt("test3.txt", im)
 
     # Optical Flow - Dense / Farneback
-        flow = cv2.calcOpticalFlowFarneback(prev_image, roi_gray, None, 0.5, 3, 15, 3, 5, 1.2, 0)
+        flow = cv2.calcOpticalFlowFarneback(temp_roi, roi_gray, None, 0.5, 3, 15, 3, 5, 1.2, 0)
         mag, ang = cv2.cartToPolar(flow[..., 0], flow[..., 1])
         hsv[..., 0] = ang*180/np.pi/2
         hsv[..., 2] = cv2.normalize(mag, None, 0, 255, cv2.NORM_MINMAX)
