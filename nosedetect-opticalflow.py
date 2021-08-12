@@ -65,6 +65,7 @@ while(True):
         weight = x + w      #end coord x
         height = y + h      #end coord y
         cv2.rectangle(bgr, (x, y), (weight, height), color, stroke)
+        cv2.rectangle(frame, (x, y), (weight, height), color, stroke)
 
     rgb_frame = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
     

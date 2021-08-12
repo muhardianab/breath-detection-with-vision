@@ -24,7 +24,6 @@ noseCascade = cv2.CascadeClassifier('haarcascade_mcs_nose.xml')
 # Capture frame as video stream
 cap = cv2.VideoCapture(0)
 #cap = cv2.VideoCapture(cv2.samples.findFile("videoplayback-faces.mp4"))
-roi_gray=[]
 
 while(True):
     # Capture frame-by-frame
